@@ -31,20 +31,23 @@ else:
 
 #Scrape album page**
 response = requests.get(albumURL) #non-object var
-soup = str(BeautifulSoup(response.content, "lxml"))
+soup = BeautifulSoup(response.content, "lxml")
 ##with open(albumURL) as html_file: #object var
 ##    soup = str(BeautifulSoup(html_file, "lxml"))
-#print(soup) #DEBUG: Checking to see if HTML was successfully grabbed
+#print(str(soup)) #DEBUG: Checking to see if HTML was successfully grabbed
 
 #Create a folder for the files to be downloaded in**
 #fetch album title
-albumTitle = soup.find('h2', class_="trackTitle")
-print(albumTitle)
+##albumTitle = soup.head2
+##print(albumTitle)
 
 #download album cover**
-##cover = soup.find('a', class_="popupImage")
-##print(cover)
-
+cover = soup.find("a", class_="popupImage")
+#print(str(cover)) #DEBUG: Checking which tag if found first
+for child in cover.descendants:
+    #print(str(child)) #DEBUG: Checking if it found the high res image of parent tag
+    coverChild = child
+print(coverChild["src"])
 
     #get album cover URL
 #assign it to coverURL
