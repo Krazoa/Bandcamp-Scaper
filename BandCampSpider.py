@@ -42,15 +42,11 @@ soup = BeautifulSoup(response.content, "lxml")
 ##print(albumTitle)
 
 #download album cover**
-cover = soup.find("a", class_="popupImage")
-#print(str(cover)) #DEBUG: Checking which tag if found first
-for child in cover.descendants:
-    #print(str(child)) #DEBUG: Checking if it found the high res image of parent tag
-    coverChild = child
-print(coverChild["src"])
-
-    #get album cover URL
+#get album cover URL
+coverTag = soup.find("img", itemprop="image")
 #assign it to coverURL
+coverUrl = coverTag.get("src"))
+#download the coverURL to destination folder
 #use scrapy to get it...
 #...and deposit it into the download destination as 'cover.jpg'
 #get number of tracks in album
