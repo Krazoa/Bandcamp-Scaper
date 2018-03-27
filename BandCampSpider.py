@@ -3,11 +3,10 @@
 import shutil
 import os
 import sys
-import subprocess
-#import urlib2
 from bs4 import BeautifulSoup
 import requests
 from lxml import etree
+import urllib.request
 
 #get target album URL**
 albumURL = input("Enter target album URL: ")
@@ -26,8 +25,8 @@ while validationCondition == 0:
             validationCondition = 1
     else:
         validationCondition = 0
-else:
-    print("DEBUG: Loop Broken")
+#else:
+    #print("DEBUG: Loop Broken")
 
 #Scrape album page**
 response = requests.get(albumURL) #non-object var
@@ -42,13 +41,15 @@ soup = BeautifulSoup(response.content, "lxml")
 ##print(albumTitle)
 
 #download album cover**
-#get album cover URL
-coverTag = soup.find("img", itemprop="image")
-#assign it to coverURL
-coverUrl = coverTag.get("src"))
-#download the coverURL to destination folder
-#use scrapy to get it...
-#...and deposit it into the download destination as 'cover.jpg'
+coverTag = soup.find("img", itemprop="image") #get album cover URL
+coverUrl = coverTag.get("src") #assign it to coverURL
+##coverResponse = requests.get(coverUrl, stream=True)#download the cover to destination folder
+##with open(downloadDestination, "w", opener=opener) as file:#deposit it into the download destination as 'cover.jpg'
+##    shutil.copyfileobj(coverResponse.raw, downloadDestination)
+print(downloadDestination + "\cover.jpg")
+urllib.request.urlretrieve(coverUrl, downloadDestination + "\cover.jpg")
+
+#downloading tracks**
 #get number of tracks in album
 #assign each track an index number
 #for each index number in the album track list...
