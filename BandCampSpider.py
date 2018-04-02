@@ -58,7 +58,7 @@ trackList = list()
 trackNameList = list()
 tracks = soup.find_all("a", href=re.compile("/track/"),itemprop="url")
 #print(tracks) #DEBUG: Checking what tags were scrapped
-##albumDesc = soup.find("meta", attrs={"name":"Description"}) #Scraping the discription: unused now
+##albumDesc = soup.find("meta", attrs={"name":"Description"}) #Scraping the discription to find no. of tracks: redundant now
 ##print(albumDesc)                                            #kept here for legacy reasons
 ##tracksOnAlbum = albumDesc.get("content")
 tracksOnAlbum = soup.find_all("span", itemprop={"name"}, text=True)
@@ -75,13 +75,26 @@ for i in range(0, 1): #####replace with trackLimit
     responseTrack = requests.get(artistURL + trackList[i])
     soup = BeautifulSoup(responseTrack.content, "lxml")
     trackJavaScript = soup.find_all("script", attrs={"type":"text/javascript"}, text=re.compile("t4.bcbits.com")) #Original method
-    #print(trackJavaScript[7]) #Index value is hard coded as the 7th "script" tag contains the mp3-128 url
-    #trackMp3128URL = trackJavaScript[7].get_text("mp3-128")
-    
-    #if the programs runs like stale shit sliding down a hill, its because of this
-    for letter 
-    
-    #print(trackMp3128URL)
+    #print(trackJavaScript[0]) #Index value is hard coded as the 0th "script" tag contains one of the three mp3-128 urls
+    trackMp3128Tag = trackJavaScript[0].get_text("mp3-128")
+    #print(len(trackMp3128Tag))
+
+    trackMp3128URL = ""
+    tagPhrase = ""
+    #if the programs runs like stale shit sliding down a hill, it's because of this
+    for letter in range (0, len(trackMp3128Tag) - 1):
+        quoteMarkCount = 0
+        if trackMp3128Tag[letter] == '"': #If a new phrase is found, trigger phrase constructor
+            quoteMarkCount += 1
+            while quoteMarkCount < 2:
+                for letterPhrase in range (letter, len(trackMp3128Tag) - 1):
+                    if trackMp3128URL[letter] == '"':
+                        quoteMarkCount += 1
+                    else:
+                        trackMp3128URL += trackMp3128URL[letter]
+        #check constructed phrase
+        print(trackMp3128URL) #DEBUG: Checking what the phrase constructor has built
+        #if trackMp3128URL == "mp3-128"
 
 
     
