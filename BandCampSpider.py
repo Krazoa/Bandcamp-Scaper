@@ -27,18 +27,28 @@ while validationCondition == 0:
             validationCondition = 1
     else:
         validationCondition = 0
-#else:
-    #print("DEBUG: Loop Broken")
+        
+#print("DEBUG: Loop Broken")
+#Timer module
+##taskTimeStart = 0
+##taskTimeEnd = 0
+##taskTimeList = list()
+        
 #Scrape album page**
+print("Getting album page HTML...")
+taskTimeStart = time.time()
 response = requests.get(albumURL) #non-object var
 soup = BeautifulSoup(response.content, "lxml")
 #print(str(soup)) #DEBUG: Checking to see if HTML was successfully grabbed
+#taskTimeList.append(taskTimeStart - taskTimeEnd)
+print("Got album page HTML")
 
-#download album cover** (WORKS)
-##coverTag = soup.find("img", itemprop="image") #get album cover URL
-##coverUrl = coverTag.get("src") #assign it to coverURL
-##urllib.request.urlretrieve(coverUrl, downloadDestination + "\cover.jpg")
-##print("Album cover downloaded successfully")
+#download album cover
+print("Downloading album cover...")
+coverTag = soup.find("img", itemprop="image") #get album cover URL
+coverUrl = coverTag.get("src") #assign it to coverURL
+urllib.request.urlretrieve(coverUrl, downloadDestination + "\cover.jpg")
+print("Album cover downloaded successfully")
 
 ##getting raw bandcamp name
 slashCount = 0
@@ -85,7 +95,8 @@ for iStr in range(0, len(tracksOnAlbum)):
 #print(trackNameListStr) #DEBUG: Checking if the "[" and "'" elements are removed
 
 #print(trackLimit) #DEBUG: Shows number of tracks on album
-for i in range(0, trackLimit): #####replace with trackLimit or 1
+for i in range(0, trackLimit): #####replace with trackLimit for normal operation or 1 for testing
+    print("Downloading track ", i, " - ", trackNameListStr[i])
     trackList.append(tracks[i].get("href"))#REMEMBER: The soup is an array/list
     #print(trackNameList[i]) #DEBUG: Checking if track names were extracted...
     #print(trackList[i]) #DEBUG: ...along with their respective track URLs
@@ -104,7 +115,7 @@ for i in range(0, trackLimit): #####replace with trackLimit or 1
     #if the programs runs like stale shit sliding down a hill, it's because of this
     #for letter in range (0, len(trackMp3128Tag) - 1): #Removed due to the resetting of 'letter' each time this was run
     mp3128URLFound = False
-    while letter != len(trackMp3128Tag) - 1 or mp3128URLFound == False:
+    while letter != len(trackMp3128Tag) - 1 and mp3128URLFound == False:
         letter += 1
         quoteMarkCount = 0
         if trackMp3128Tag[letter] == '"': #If a new phrase is found, trigger phrase constructor
@@ -131,6 +142,7 @@ for i in range(0, trackLimit): #####replace with trackLimit or 1
             while endQuoteMark == False:
                 if trackMp3128Tag[Mp3128URLIndex] == '"':
                     endQuoteMark = True
+                    letter = len(trackMp3128Tag) - 1
                 else:
                     trackMp3128URL += trackMp3128Tag[Mp3128URLIndex]
                     Mp3128URLIndex += 1
@@ -138,11 +150,9 @@ for i in range(0, trackLimit): #####replace with trackLimit or 1
             #print(trackMp3128URL) #DEBUG: Checking if the url has been correctly found and placed in variable
         if mp3128URLFound == True:
             #downloading the mmp3-128 file
-            print(downloadDestination + "\\" + str(trackNameListStr[i]) + ".mp3")
+            urllib.request.urlretrieve(trackMp3128URL, downloadDestination + "\\" + str(trackNameListStr[i]) + ".mp3")
+            print("Download Complete!")
+            print("Saved as: ", downloadDestination + "\\" + str(trackNameListStr[i]) + ".mp3")
             letter = Mp3128URLIndex
-            #urllib.request.urlretrieve(trackMp3128URL, downloadDestination + "\\" + str(?????)) )
-    else:
-        break
-        #ISSUE: Infinite loop
 print("Done")
 
