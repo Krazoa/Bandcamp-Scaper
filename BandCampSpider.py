@@ -56,6 +56,7 @@ while slashCount < 3:
 noOfTracks = 0
 trackList = list()
 trackNameList = list()
+trackNameListStr = list()
 tracks = soup.find_all("a", href=re.compile("/track/"),itemprop="url")
 #print(tracks) #DEBUG: Checking what tags were scrapped
 ##albumDesc = soup.find("meta", attrs={"name":"Description"}) #Scraping the discription to find no. of tracks: redundant now
@@ -64,10 +65,27 @@ tracks = soup.find_all("a", href=re.compile("/track/"),itemprop="url")
 tracksOnAlbum = soup.find_all("span", itemprop={"name"}, text=True)
 #print(tracksOnAlbum)
 for trackName in tracksOnAlbum:
-    trackNameList.append(trackName.find_all(text=True))
+    trackNameList.append(trackName.find_all(text=True, recursive=False))
+#print(trackNameList) #DEBUG: Show the list of track names
 trackLimit = len(tracksOnAlbum)
+
+for iStr in range(0, len(tracksOnAlbum)):
+    trackNameStrStore = str(trackNameList[iStr])
+    trackCharIndex = 0
+    trackNameStr = ""
+    while trackCharIndex != len(trackNameStrStore):
+        if trackNameStrStore[trackCharIndex] == "[" or trackNameStrStore[trackCharIndex] == "]":
+            pass
+        elif trackNameStrStore[trackCharIndex] == "'" or trackNameStrStore[trackCharIndex] == "'":
+            pass
+        else:
+            trackNameStr += trackNameStrStore[trackCharIndex]
+        trackCharIndex += 1
+    trackNameListStr.append(trackNameStr)
+#print(trackNameListStr) #DEBUG: Checking if the "[" and "'" elements are removed
+
 #print(trackLimit) #DEBUG: Shows number of tracks on album
-for i in range(0, 1): #####replace with trackLimit
+for i in range(0, trackLimit): #####replace with trackLimit or 1
     trackList.append(tracks[i].get("href"))#REMEMBER: The soup is an array/list
     #print(trackNameList[i]) #DEBUG: Checking if track names were extracted...
     #print(trackList[i]) #DEBUG: ...along with their respective track URLs
@@ -81,23 +99,50 @@ for i in range(0, 1): #####replace with trackLimit
 
     trackMp3128URL = ""
     tagPhrase = ""
+    letter = 0
+    firstOddQuoteMark = True
     #if the programs runs like stale shit sliding down a hill, it's because of this
-    for letter in range (0, len(trackMp3128Tag) - 1):
+    #for letter in range (0, len(trackMp3128Tag) - 1): #Removed due to the resetting of 'letter' each time this was run
+    mp3128URLFound = False
+    while letter != len(trackMp3128Tag) - 1 or mp3128URLFound == False:
+        letter += 1
         quoteMarkCount = 0
         if trackMp3128Tag[letter] == '"': #If a new phrase is found, trigger phrase constructor
-            quoteMarkCount += 1
-            while quoteMarkCount < 2:
-                for letterPhrase in range (letter, len(trackMp3128Tag) - 1):
-                    if trackMp3128URL[letter] == '"':
+##            if firstOddQuoteMark == True:
+##                quoteMarkCount = 2
+##                firstOddQuoteMark = False
+##            elif firstOddQuoteMark == False:
+                quoteMarkCount += 1
+                tagPhrase = ""
+                while quoteMarkCount < 2:
+                    letter += 1
+                    #for letterPhrase in range (letter, len(trackMp3128Tag) - 1):
+                    if trackMp3128Tag[letter] == '"':
                         quoteMarkCount += 1
                     else:
-                        trackMp3128URL += trackMp3128URL[letter]
-        #check constructed phrase
-        print(trackMp3128URL) #DEBUG: Checking what the phrase constructor has built
-        #if trackMp3128URL == "mp3-128"
-
-
-    
-#change albumUrl into albumTrackUrl (See notes)
+                        tagPhrase += trackMp3128Tag[letter]
+        #print(tagPhrase) #DEBUG: Checking what the phrase constructor has built
+        #This if statement produces 2 valid variations of the mp3-128 url. It has been
+        #now set to only produce 1 but should be required, the other can be utilised
+        if tagPhrase == "mp3-128" and mp3128URLFound == False:
+            #print("Mp3-128 URL found")
+            Mp3128URLIndex = letter + 3
+            endQuoteMark = False
+            while endQuoteMark == False:
+                if trackMp3128Tag[Mp3128URLIndex] == '"':
+                    endQuoteMark = True
+                else:
+                    trackMp3128URL += trackMp3128Tag[Mp3128URLIndex]
+                    Mp3128URLIndex += 1
+            mp3128URLFound = True
+            #print(trackMp3128URL) #DEBUG: Checking if the url has been correctly found and placed in variable
+        if mp3128URLFound == True:
+            #downloading the mmp3-128 file
+            print(downloadDestination + "\\" + str(trackNameListStr[i]) + ".mp3")
+            letter = Mp3128URLIndex
+            #urllib.request.urlretrieve(trackMp3128URL, downloadDestination + "\\" + str(?????)) )
+    else:
+        break
+        #ISSUE: Infinite loop
 print("Done")
 
