@@ -29,10 +29,12 @@ while validationCondition == 0:
         validationCondition = 0
         
 #print("DEBUG: Loop Broken")
-#Timer module
-##taskTimeStart = 0
-##taskTimeEnd = 0
-##taskTimeList = list()
+####Timer module
+taskTimeStart = 0
+taskTimeEnd = 0
+taskTimeDiff = 0
+taskTimeTotal = 0
+    
         
 #Scrape album page**
 print("Getting album page HTML...")
@@ -42,13 +44,22 @@ soup = BeautifulSoup(response.content, "lxml")
 #print(str(soup)) #DEBUG: Checking to see if HTML was successfully grabbed
 #taskTimeList.append(taskTimeStart - taskTimeEnd)
 print("Got album page HTML")
+taskTimeEnd = time.time()
+taskTimeDiff = float(taskTimeEnd - taskTimeStart)
+print("Operation completed in ", taskTimeDiff, "s")
+taskTimeTotal += taskTimeDiff
 
 #download album cover
 print("Downloading album cover...")
+taskTimeStart = time.time()
 coverTag = soup.find("img", itemprop="image") #get album cover URL
 coverUrl = coverTag.get("src") #assign it to coverURL
 urllib.request.urlretrieve(coverUrl, downloadDestination + "\cover.jpg")
 print("Album cover downloaded successfully")
+taskTimeEnd = time.time()
+taskTimeDiff = float(taskTimeEnd - taskTimeStart)
+print("Operation completed in ", taskTimeDiff, "s")
+taskTimeTotal += taskTimeDiff
 
 ##getting raw bandcamp name
 slashCount = 0
@@ -97,6 +108,7 @@ for iStr in range(0, len(tracksOnAlbum)):
 #print(trackLimit) #DEBUG: Shows number of tracks on album
 for i in range(0, trackLimit): #####replace with trackLimit for normal operation or 1 for testing
     print("Downloading track ", i, " - ", trackNameListStr[i])
+    taskTimeStart = time.time()
     trackList.append(tracks[i].get("href"))#REMEMBER: The soup is an array/list
     #print(trackNameList[i]) #DEBUG: Checking if track names were extracted...
     #print(trackList[i]) #DEBUG: ...along with their respective track URLs
@@ -151,8 +163,15 @@ for i in range(0, trackLimit): #####replace with trackLimit for normal operation
         if mp3128URLFound == True:
             #downloading the mmp3-128 file
             urllib.request.urlretrieve(trackMp3128URL, downloadDestination + "\\" + str(trackNameListStr[i]) + ".mp3")
-            print("Download Complete!")
             print("Saved as: ", downloadDestination + "\\" + str(trackNameListStr[i]) + ".mp3")
             letter = Mp3128URLIndex
+            taskTimeEnd = time.time()
+            taskTimeDiff = float(taskTimeEnd - taskTimeStart)
+            print("Operation completed in ", taskTimeDiff, "s")
+            taskTimeTotal += taskTimeDiff
+            
+print("Download Complete!")
+print("All files saved in ", downloadDestination)
+print("Total operation time: ", taskTimeTotal, "s")
 print("Done")
 
