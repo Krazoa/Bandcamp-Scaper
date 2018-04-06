@@ -117,6 +117,10 @@ for i in range(0, trackLimit): #####replace with trackLimit for normal operation
     soup = BeautifulSoup(responseTrack.content, "lxml")
     trackJavaScript = soup.find_all("script", attrs={"type":"text/javascript"}, text=re.compile("t4.bcbits.com")) #Original method
     #print(trackJavaScript[0]) #Index value is hard coded as the 0th "script" tag contains one of the three mp3-128 urls
+    if trackJavaScript == "":
+        print("BUG: trackMp3128Tag = trackJavaScript[0].get_text(\"mp3-128\")\nIndexError: list index out of range")
+        print("Skipping track")
+        break
     trackMp3128Tag = trackJavaScript[0].get_text("mp3-128")
     #print(len(trackMp3128Tag))
 
