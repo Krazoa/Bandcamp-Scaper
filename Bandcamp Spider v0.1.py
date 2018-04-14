@@ -1,4 +1,5 @@
 #Code by: Krazoa
+#Bandcamp Spider: v0.1
 
 import shutil
 import os
